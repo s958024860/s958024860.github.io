@@ -1,20 +1,12 @@
 <template>
   <div id="app">
-    <FormTest />
-<!--    <Test />-->
+    <router-view />
   </div>
 </template>
 
 <script>
-import FormTest from './components/FormTest.vue'
-// import Test from './components/Test.vue'
-
 export default {
   name: 'App',
-  components: {
-    FormTest,
-    // Test,
-  }
 }
 </script>
 
