@@ -128,7 +128,8 @@
 
 <script>
 import Member from './Member'
-import members from '../assets/json/member.json'
+// import members from '../assets/json/member.json'
+import { getMemberList } from '../api'
 import _ from 'lodash'
 const ORDER = {
   // 原收货人姓名
@@ -267,7 +268,9 @@ export default {
         if (row.consigneeName) {
           // 清空列表
           this.$set(row, 'visible', true)
-          const _members = JSON.parse(JSON.stringify(members))
+          // const _members = JSON.parse(JSON.stringify(members))
+          const _members = await getMemberList()
+          console.log(_members)
           this.members = _members.filter(el => el.name.includes(row.consigneeName))
           this.currentRowIndex = -1
         }
