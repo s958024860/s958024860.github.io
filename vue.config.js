@@ -1,5 +1,12 @@
-// const path = require('path')
-// const webpackConfig = require('./webpack-config/config.js')
+const webpack = require('webpack')
+const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin')
+const tee3 = [
+  'js/tee3/cn.tee3.avd-3.6.0.0.min.js',
+  'js/tee3/init.js',
+  'js/jquery.min.js'
+]
+
+const assets = [ ...tee3 ]
 
 module.exports = {
   lintOnSave: true,
@@ -40,25 +47,17 @@ module.exports = {
   //
   // },
   //
-  // configureWebpack: (config) => {
-  //   if (process.env.NODE_ENV === 'production') {
-  //     config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
-  //   }
-  //   return webpackConfig;
-  // },
-  //
-  // css: {
-  //   loaderOptions: {
-  //     less: {
-  //       javascriptEnabled: true,
-  //       modifyVars: {
-  //         // red: '#03a9f4',
-  //         // blue: '#3eaf7c',
-  //         // orange: '#f08d49',
-  //         // 'text-color': '#111'
-  //       }
-  //     }
-  //   }
-  // }
-
-};
+  configureWebpack: config => {
+    return {
+      plugin: [
+        new webpack.ProvidePlugin({
+          Log: 'lmw-console-log'
+        }),
+        new HtmlWebpackIncludeAssetsPlugin({
+          assets: assets,
+          append: false
+        })
+      ]
+    }
+  },
+}
