@@ -13,9 +13,9 @@
       <el-button @click="update">修改</el-button>
     </div>
     <KeyObject
-        v-for="item in keyList"
-        :key="item.id"
-        :data-obj="item"
+      v-for="item in keyList"
+      :key="item.id"
+      :data-obj="item"
     />
   </div>
 </template>

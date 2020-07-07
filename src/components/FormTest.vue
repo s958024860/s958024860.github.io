@@ -3,114 +3,114 @@
     <el-form ref="form" class="form" :model="form" :rules="rules">
       <el-form-item>
         <el-table
-            :data="form.orderList"
-            stripe
-            style="width: 100%"
+          :data="form.orderList"
+          stripe
+          style="width: 100%"
         >
           <el-table-column
-              prop="consigneeName"
-              label="收货人姓名"
+            prop="consigneeName"
+            label="收货人姓名"
           >
             <template slot-scope="scope">
               <el-form-item label="" :prop="`orderList.${scope.$index}.consigneeName`" :rules="rules.orderList.consigneeName">
                 <el-popover
-                    v-model="scope.row.visible"
-                    placement="bottom-start"
-                    title=""
-                    trigger="manual"
-                    width="800"
+                  v-model="scope.row.visible"
+                  placement="bottom-start"
+                  title=""
+                  trigger="manual"
+                  width="800"
                 >
                   <el-input
-                      :ref="`member-input_${scope.$index}`"
-                      slot="reference"
-                      v-model="scope.row.consigneeName"
-                      placeholder="姓名"
-                      @keydown.native.esc.stop.prevent="displayNoneMedicineList(scope.row)"
-                      @keydown.native.tab="displayNoneMedicineList(scope.row)"
-                      @keydown.native.down.stop.prevent="navigateRow('next')"
-                      @keydown.native.up.stop.prevent="navigateRow('prev')"
-                      @keyup.enter.native="memberSearch(scope.row)"
-                      @paste.native="e => { debounceSearch(e, scope.row) }"
-                      @keyup.native="e => { debounceSearch(e, scope.row) }"
+                    :ref="`member-input_${scope.$index}`"
+                    slot="reference"
+                    v-model="scope.row.consigneeName"
+                    placeholder="姓名"
+                    @keydown.native.esc.stop.prevent="displayNoneMedicineList(scope.row)"
+                    @keydown.native.tab="displayNoneMedicineList(scope.row)"
+                    @keydown.native.down.stop.prevent="navigateRow('next')"
+                    @keydown.native.up.stop.prevent="navigateRow('prev')"
+                    @keyup.enter.native="memberSearch(scope.row)"
+                    @paste.native="e => { debounceSearch(e, scope.row) }"
+                    @keyup.native="e => { debounceSearch(e, scope.row) }"
                   ></el-input>
                   <Member
-                      :members="members"
-                      :current-row-index="currentRowIndex"
-                      @setMemberInfo="(value) => { setMemberInfo(scope.row, value) }"
+                    :members="members"
+                    :current-row-index="currentRowIndex"
+                    @setMemberInfo="(value) => { setMemberInfo(scope.row, value) }"
                   />
                 </el-popover>
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consigneeSex"
-              label="收货人性别"
+            prop="consigneeSex"
+            label="收货人性别"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consigneeSex || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consigneePhoneNo"
-              label="收货人电话"
+            prop="consigneePhoneNo"
+            label="收货人电话"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consigneePhoneNo || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consigneeAddr"
-              label="收货人地址"
+            prop="consigneeAddr"
+            label="收货人地址"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consigneeAddr || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consignorName"
-              label="发货人姓名"
+            prop="consignorName"
+            label="发货人姓名"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consignorName || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consignorPhoneNo"
-              label="发货人电话"
+            prop="consignorPhoneNo"
+            label="发货人电话"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consignorPhoneNo || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="consignorAddr"
-              label="发货人地址"
+            prop="consignorAddr"
+            label="发货人地址"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.consignorAddr || '--' }}</span>
             </template>
           </el-table-column>
           <el-table-column
-              prop="remark"
-              label="备注"
+            prop="remark"
+            label="备注"
           >
             <template slot-scope="scope">
               <el-input
-                  v-model="scope.row.remark"
-                  @keyup.enter.native="enterRemark(scope.$index)"
+                v-model="scope.row.remark"
+                @keyup.enter.native="enterRemark(scope.$index)"
               ></el-input>
             </template>
           </el-table-column>
           <el-table-column
-              prop="operation"
-              label=""
-              width="80"
+            prop="operation"
+            label=""
+            width="80"
           >
             <template slot="header">
               <i
-                  class="el-icon-circle-plus-outline"
-                  style="cursor: pointer;"
-                  @click="addOrder()"
+                class="el-icon-circle-plus-outline"
+                style="cursor: pointer;"
+                @click="addOrder()"
               ></i>
             </template>
             <template slot-scope="scope">

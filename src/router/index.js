@@ -15,7 +15,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: '/home'
+    redirect: '/home',
   },
   {
     path: '/home',
@@ -31,6 +31,11 @@ const routes = [
     path: '/keyTest',
     name: 'keyTest',
     component: KeyTest,
+  },
+  {
+    path: '/touch-scale',
+    name: 'touchScale',
+    component: () => import('../pages/TouchScale')
   }
 ]
 

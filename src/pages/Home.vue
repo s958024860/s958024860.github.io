@@ -10,6 +10,9 @@
       <li>
         <router-link to="/video-tee3">tee3音视频测试</router-link>
       </li>
+      <li>
+        <router-link to="/touch-scale">双指缩放图片</router-link>
+      </li>
     </ul>
   </div>
 </template>

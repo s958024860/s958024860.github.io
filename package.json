@@ -19,6 +19,7 @@
     "html-webpack-include-assets-plugin": "^2.0.0",
     "lmw-console-log": "^1.0.2",
     "lodash": "^4.17.15",
+    "markdown-it-vue": "^1.1.2",
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
     "vue-router": "^3.3.4"
@@ -55,10 +56,17 @@
       "parser": "babel-eslint"
     },
     "rules": {
-      "indent": ["error", 2, {
-        "SwitchCase": 1
-      }],
-      "vue/html-indent": ["error", 2]
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "vue/html-indent": [
+        "error",
+        2
+      ]
     }
   },
   "browserslist": [

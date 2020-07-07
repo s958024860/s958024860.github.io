@@ -46,18 +46,18 @@ module.exports = {
   //     .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
   //
   // },
-  //
-  configureWebpack: config => {
-    return {
-      plugin: [
-        new webpack.ProvidePlugin({
-          Log: 'lmw-console-log'
-        }),
-        new HtmlWebpackIncludeAssetsPlugin({
-          assets: assets,
-          append: false
-        })
-      ]
-    }
-  },
+  // todo
+  // configureWebpack: config => {
+  //   return {
+  //     plugin: [
+  //       new webpack.ProvidePlugin({
+  //         Log: 'lmw-console-log'
+  //       }),
+  //       new HtmlWebpackIncludeAssetsPlugin({
+  //         assets: assets,
+  //         append: false
+  //       })
+  //     ]
+  //   }
+  // },
 }
