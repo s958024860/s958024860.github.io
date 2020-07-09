@@ -10,7 +10,6 @@ module.exports = {
       2,
       'always',
       [
-        'sfz',
         'chore', // 构建
         'merge', // 合并
         'add', // 新增
