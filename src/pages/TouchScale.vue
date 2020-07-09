@@ -135,7 +135,7 @@ export default {
     handlePreview(file) {
       console.log(file);
     },
-    beforeRemove(file, fileList) {
+    beforeRemove(file) {
       return this.$confirm(`确定移除 ${ file.name }？`);
     },
     handleChange (file, fileList) {
