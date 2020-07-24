@@ -9,6 +9,7 @@ const tee3 = [
 const assets = [ ...tee3 ]
 
 module.exports = {
+  runtimeCompiler: true, // You are using the runtime-only build of Vue where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.
   lintOnSave: true,
   publicPath: './',
   devServer: {
@@ -47,17 +48,17 @@ module.exports = {
   //
   // },
   // todo
-  // configureWebpack: config => {
-  //   return {
-  //     plugin: [
-  //       new webpack.ProvidePlugin({
-  //         Log: 'lmw-console-log'
-  //       }),
-  //       new HtmlWebpackIncludeAssetsPlugin({
-  //         assets: assets,
-  //         append: false
-  //       })
-  //     ]
-  //   }
-  // },
+  configureWebpack: config => {
+    return {
+      // plugin: [
+      //   new webpack.ProvidePlugin({
+      //     Log: 'lmw-console-log'
+      //   }),
+      //   new HtmlWebpackIncludeAssetsPlugin({
+      //     assets: assets,
+      //     append: false
+      //   })
+      // ]
+    }
+  },
 }

@@ -36,7 +36,17 @@ const routes = [
     path: '/touch-scale',
     name: 'touchScale',
     component: () => import('../pages/TouchScale')
-  }
+  },
+  {
+    path: '/component-name-test',
+    name: 'ComponentNameTest',
+    component: () => import('../pages/ComponentNameTest')
+  },
+  {
+    path: '/css-var',
+    name: 'cssVar',
+    component: () => import('../pages/CssVar')
+  },
 ]
 
 const router = new VueRouter({

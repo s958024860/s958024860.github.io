@@ -13,6 +13,16 @@ import MarkdownItVue from 'markdown-it-vue'
 
 import App from './App.vue'
 
+// 注册全局组件 测试
+Vue.component('ButtonCounter', {
+  data: function () {
+    return {
+      count: 0
+    }
+  },
+  template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+})
+
 Vue.use(MarkdownItVue)
 Vue.use(ElementUI)
 

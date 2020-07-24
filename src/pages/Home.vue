@@ -13,13 +13,19 @@
       <li>
         <router-link to="/touch-scale">双指缩放图片</router-link>
       </li>
+      <li>
+        <router-link to="/component-name-test">组件命名测试</router-link>
+      </li>
+      <li>
+        <router-link to="/css-var">css变量交互</router-link>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Home'
+  name: 'Home',
 }
 </script>
 
