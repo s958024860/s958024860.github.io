@@ -16,10 +16,12 @@
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
+    "html-loader": "^1.1.0",
     "html-webpack-include-assets-plugin": "^2.0.0",
     "lmw-console-log": "^1.0.2",
     "lodash": "^4.17.15",
     "markdown-it-vue": "^1.1.2",
+    "markdown-loader": "^5.1.0",
     "uuid": "^8.1.0",
     "vue": "^2.6.11",
     "vue-router": "^3.3.4"

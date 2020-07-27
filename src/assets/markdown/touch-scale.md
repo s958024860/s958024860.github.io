@@ -1,6 +1,6 @@
 ## 源代码
 
-`<img id="image" src="1.png">`
+`<img id="img" src="../image/qrcode-touch-scale.png" />`
 
 ```ecmascript 6
 const eleImg = document.querySelector('#image')

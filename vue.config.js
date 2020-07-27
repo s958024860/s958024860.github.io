@@ -25,28 +25,35 @@ module.exports = {
 
   // // transpileDependencies: ['填入需要后编译的模块名'],
   //
-  // chainWebpack: (config) => {
-  //   config.module.rules.delete('svg')
-  //   config.module
-  //     .rule('svg-sprite-loader')
-  //     .test(/.svg$/)
-  //     .include
-  //     .add(path.resolve(__dirname, './src/icons'))
-  //     .end()
-  //     .use('svg-sprite-loader')
-  //     .loader('svg-sprite-loader')
-  //     .options({
-  //       symbolId: '[name]'
-  //     })
-  //     .end()
-  //
-  //   const imagesRule = config.module.rule('images')
-  //   imagesRule.exclude.add(path.resolve(__dirname, './src/icons'))
-  //   config.module
-  //     .rule('images')
-  //     .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
-  //
-  // },
+  chainWebpack: config => {
+    config.module
+      .rule('md')
+      .test(/\.md$/)
+      .use('markdown-loader')
+      .loader('markdown-loader')
+      .loader('html-loader')
+
+    // config.module.rules.delete('svg')
+    // config.module
+    //   .rule('svg-sprite-loader')
+    //   .test(/.svg$/)
+    //   .include
+    //   .add(path.resolve(__dirname, './src/icons'))
+    //   .end()
+    //   .use('svg-sprite-loader')
+    //   .loader('svg-sprite-loader')
+    //   .options({
+    //     symbolId: '[name]'
+    //   })
+    //   .end()
+    //
+    // const imagesRule = config.module.rule('images')
+    // imagesRule.exclude.add(path.resolve(__dirname, './src/icons'))
+    // config.module
+    //   .rule('images')
+    //   .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
+
+  },
   // todo
   configureWebpack: config => {
     return {

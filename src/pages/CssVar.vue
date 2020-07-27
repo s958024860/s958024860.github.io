@@ -11,6 +11,7 @@
       <li>通过变量状态控制class： 如 <strong class="primary">:class="{ read: isRead }"</strong></li>
     </ul>
     <ul>
+      <markdown-it-vue class="md-body" :content="content"></markdown-it-vue>
       如今有了一种css变量的支持丰富增加了js交互，使之更加灵活
       <div :style="`--textHeight: ${height};`" class="test-box">test-height</div>
     </ul>
@@ -22,7 +23,8 @@ export default {
   name: 'CssVar',
   data () {
     return {
-      height: 40
+      height: 40,
+      content: '<div :style="`--textHeight: ${height};`" class="test-box">test-height</div>'
     }
   },
 }

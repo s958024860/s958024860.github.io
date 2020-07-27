@@ -23,6 +23,11 @@ const routes = [
     component: Home,
   },
   {
+    path: '/test',
+    name: 'test',
+    component: () => import('../pages/Test')
+  },
+  {
     path: '/formTableTest',
     name: 'formTableTest',
     component: FormTableTest,

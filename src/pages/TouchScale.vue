@@ -7,35 +7,21 @@
   <div class="touch-scale">
     <span>缩放图片</span>
     <img id="img" src="../assets/image/qrcode-touch-scale.png" />
-    <el-upload
-      class="upload-demo"
-      action="https://jsonplaceholder.typicode.com/posts/"
-      :on-preview="handlePreview"
-      :on-remove="handleRemove"
-      :before-remove="beforeRemove"
-      :on-change="handleChange"
-      :file-list="fileList"
-      :auto-upload="false"
-    >
-      <el-button size="small" type="primary">点击上传</el-button>
-    </el-upload>
     <span>源码展示</span>
-    <markdown-it-vue class="md-body" :content="content"></markdown-it-vue>
+    <markdown-it-vue id="write" class="md-body" :content="content"></markdown-it-vue>
   </div>
 </template>
 
 <script>
-// import source from '../assets/markdown/touch-scale.md'
+import source from '../assets/markdown/touch-scale.md'
+
 export default {
   name: 'TouchScale',
   data () {
     return {
-      content: '',
+      content: source,
       fileList: []
     }
-  },
-  created () {
-    // console.log(sources.toString())
   },
   mounted () {
     const eleImg = document.querySelector('#image')
@@ -129,27 +115,9 @@ export default {
     });
   },
   methods: {
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    beforeRemove(file) {
-      return this.$confirm(`确定移除 ${ file.name }？`);
-    },
-    handleChange (file, fileList) {
-      console.log(file, fileList)
-      const reader = new FileReader()
-      reader.readAsText(file.raw)
-      reader.onload = () => {
-        this.content = reader.result
-      }
-    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>
