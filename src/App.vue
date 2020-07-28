@@ -5,16 +5,40 @@
 </template>
 
 <script>
+
 export default {
   name: 'App',
   created () {
-    document.addEventListener('mousedown', function (event) {
-      console.log(event.pageX, event.pageY)
-      const body = document.body
-      body.style.setProperty('--pageX', event.pageX)
-      body.style.setProperty('--pageY', event.pageY)
-    })
-  }
+    this.addWatermark()
+    // this.addHighlight()
+  },
+  methods: {
+    /**
+     * 添加点击水印
+     */
+    addWatermark () {
+      document.addEventListener('mousedown', function (event) {
+        console.log(event.pageX, event.pageY)
+        const body = document.body
+        body.style.setProperty('--pageX', event.pageX)
+        body.style.setProperty('--pageY', event.pageY)
+      })
+    },
+    /**
+     * 添加代码高亮
+     * @returns {Promise<void>}
+     */
+    async addHighlight () {
+      // 初始化
+      window.hljs.initHighlightingOnLoad()
+      // hljs.initLineNumbersOnLoad()
+      // await this.$nextTick()
+      // const codeBoxes = document.querySelectorAll('code.hljs')
+      // for (let codeBox of codeBoxes) {
+      //   hljs.lineNumbersBlock(codeBox)
+      // }
+    },
+  },
 }
 </script>
 

@@ -14,6 +14,8 @@ import './mock'
 import httpInstance from './api/httpInstance'
 // markdown 支持
 import MarkdownItVue from 'markdown-it-vue'
+// markdown 样式
+import 'github-markdown-css/github-markdown.css'
 
 import App from './App.vue'
 

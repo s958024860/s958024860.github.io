@@ -52,6 +52,11 @@ const routes = [
     name: 'cssVar',
     component: () => import('../pages/CssVar')
   },
+  {
+    path: '/text-overflow',
+    name: 'textOverflow',
+    component: () => import('../pages/TextOverflow')
+  },
 ]
 
 const router = new VueRouter({
