@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d226964"],{e8fa:function(e,n,t){"use strict";t.r(n);var c=function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("ButtonCounter")},o=[],u={name:"ComponentNameTest"},a=u,r=t("2877"),s=Object(r["a"])(a,c,o,!1,null,"57c6e3cf",null);n["default"]=s.exports}}]);
-//# sourceMappingURL=chunk-2d226964.5a48ea61.js.map
