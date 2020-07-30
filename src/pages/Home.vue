@@ -25,6 +25,9 @@
       <li>
         <router-link to="/text-overflow">css对溢出文本的处理方案</router-link>
       </li>
+      <li>
+        <router-link to="/tab-exit">浏览器退出提示</router-link>
+      </li>
     </ul>
   </div>
 </template>

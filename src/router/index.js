@@ -57,6 +57,11 @@ const routes = [
     name: 'textOverflow',
     component: () => import('../pages/TextOverflow')
   },
+  {
+    path: '/tab-exit',
+    name: 'tabExit',
+    component: () => import('../pages/TabExit')
+  },
 ]
 
 const router = new VueRouter({
