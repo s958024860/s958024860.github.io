@@ -1,0 +1,29 @@
+<!--
+ * @Author: fzsong3
+ * @Date: 2020/8/3 19:07
+ * @Description:
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<button id="btn">下载</button>
+<a href="https://zlwyl-dev.iflyhealth.com/swift/v1/pb/301752590336.TXT" download="download">下载文件</a>
+<script>
+  const btn = document.getElementById('btn')
+  window.addEventListener('click', function (e) {
+    createDownloadIframe()
+  })
+  function createDownloadIframe () {
+    const url = 'https://zlwyl-dev.iflyhealth.com/swift/v1/pb/301752590336.txt'
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = "javascript: '<script>location.href=\"" + url + "\"<\/script>'"
+    document.getElementsByTagName('body')[0].appendChild(iframe)
+  }
+</script>
+</body>
+</html>

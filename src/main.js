@@ -6,6 +6,9 @@ import 'element-ui/lib/theme-chalk/index.css'
 // 引入全局样式
 import './assets/style/index.scss'
 
+// 引入全局指令
+import './directives'
+
 // 引入路由
 import router from './router'
 // 引入mock数据

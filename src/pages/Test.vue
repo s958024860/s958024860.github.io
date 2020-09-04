@@ -5,69 +5,53 @@
 -->
 <template>
   <div class="test">
-    <div class="form" ref="form"></div>
-    <template v-for="(item, index) in testData">
-      <TestChild
-        v-show="currentIndex === index"
-        :key="item.id"
-        :source="item"
-      />
-    </template>
+    <TestChild/>
+<!--    <div v-show="showFlag" v-if="ifFlag">-->
+<!--&lt;!&ndash;      <div class="box" v-wrap-title >{{ text | testFormat }}</div>&ndash;&gt;-->
+<!--      <TestChild/>-->
+<!--    </div>-->
+<!--    <el-button @click="showFlag = !showFlag">show显示、关闭</el-button>-->
+<!--    <el-button @click="ifFlag = !ifFlag">if显示、关闭</el-button>-->
   </div>
 </template>
 
 <script>
 
-import TestChild from '../components/TestChild'
+import TestChild from "./TestChild";
 
 export default {
   name: 'Test',
   components: { TestChild },
   data () {
     return {
-      currentIndex: 0,
-      popWidth: 0,
-      testData: [
-        { id: 'sdf', name: 'sdf' },
-        { id: 'sgsdf', name: 'sdf' },
-        { id: 'sdfggh', name: 'sdf' },
-        { id: 'sdhhhf', name: 'sdf' },
-        { id: 'sddsssf', name: 'sdf' },
-      ]
+      showFlag: false,
+      ifFlag: false,
+      text: '收代理费快结束了收代理费快结束了收代理费快结束了收代理费快结束了',
     }
   },
+  filters: {
+    testFormat (value) {
+      return value + '13245'
+    },
+  },
   mounted () {
-    this.observer = new ResizeObserver(() => {
-      this.getPopWidth()
-    }).observe(this.$refs['form'])
-    // // // 监控表单尺寸变化 todo
-    // this.observer.observe(this.$refs['form'])
   },
   beforeDestroy () {
-    // 清除监听
-    this.observer.unobserve(this.$refs['form'])
   },
   methods: {
-    async getPopWidth () {
-      await this.$nextTick()
-      if (this.$refs['form']) {
-        this.popWidth = this.$refs['form'].clientHeight
-          ? this.$refs['form'].clientHeight - 80
-          : 800
-      }
-      console.log(this.popWidth)
-    },
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .test {
     height: 100%;
     width: 100%;
-  }
-  .form {
-    height: 100%;
-    width: 100%;
+    .box {
+      width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 </style>

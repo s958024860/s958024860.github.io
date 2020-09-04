@@ -18,7 +18,6 @@ export default {
      */
     addWatermark () {
       document.addEventListener('mousedown', function (event) {
-        console.log(event.pageX, event.pageY)
         const body = document.body
         body.style.setProperty('--pageX', event.pageX)
         body.style.setProperty('--pageY', event.pageY)
