@@ -3,6 +3,10 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+// 引入 echarts
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts
+
 // 引入全局样式
 import './assets/style/index.scss'
 

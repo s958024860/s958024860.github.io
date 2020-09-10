@@ -28,6 +28,9 @@
       <li>
         <router-link to="/tab-exit">浏览器退出提示</router-link>
       </li>
+      <li>
+        <router-link to="/map">地图</router-link>
+      </li>
     </ul>
   </div>
 </template>

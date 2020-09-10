@@ -62,6 +62,11 @@ const routes = [
     name: 'tabExit',
     component: () => import('../pages/TabExit')
   },
+  {
+    path: '/map',
+    name: 'tabExit',
+    component: () => import('../pages/AnHuiMap')
+  },
 ]
 
 const router = new VueRouter({

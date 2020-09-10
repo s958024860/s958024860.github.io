@@ -5,13 +5,15 @@
 -->
 <template>
   <div class="test">
-    <TestChild />
-    <!--    <div v-show="showFlag" v-if="ifFlag">-->
-    <!--&lt;!&ndash;      <div class="box" v-wrap-title >{{ text | testFormat }}</div>&ndash;&gt;-->
-    <!--      <TestChild/>-->
-    <!--    </div>-->
-    <!--    <el-button @click="showFlag = !showFlag">show显示、关闭</el-button>-->
-    <!--    <el-button @click="ifFlag = !ifFlag">if显示、关闭</el-button>-->
+    <el-select v-model="dataFieldCode" filterable @change="dataChanged">
+      <el-option
+        v-for="(item, index) in codeOptions"
+        :key="item.id"
+        :label="item.name"
+        :value="item.id"
+      >
+      </el-option>
+    </el-select>
   </div>
 </template>
 
@@ -22,9 +24,16 @@ export default {
   components: { TestChild },
   data () {
     return {
-      showFlag: false,
-      ifFlag: false,
-      text: '收代理费快结束了收代理费快结束了收代理费快结束了收代理费快结束了',
+      dataFieldCode: '',
+      codeOptions: [
+        { name: 'sfz', id: 'sdf' },
+        { name: 'sfz1', id: 'sfz1' },
+        { name: 'sfz2', id: 'sfz2' },
+        { name: 'sfz3', id: 'sfz3' },
+        { name: 'sfz4', id: 'sfz4' },
+        { name: 'sfz5', id: 'sfz5' },
+        { name: 'sfz6', id: 'sfz6' },
+      ]
     }
   },
   filters: {
@@ -35,6 +44,9 @@ export default {
   mounted () { },
   beforeDestroy () { },
   methods: {
+    dataChanged (item) {
+      console.log(item)
+    },
     diyTest (pram2, paramArr) {
       console.log(pram2)
       console.log(paramArr)
