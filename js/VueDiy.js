@@ -6,7 +6,7 @@
 
 // 进行umd支持 amd/cmd/commonjs
 import KeyTest from "../src/pages/KeyTest";
-import {merge} from "less/lib/less/utils";
+import { merge } from "less/lib/less/utils";
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
@@ -1190,15 +1190,402 @@ import {merge} from "less/lib/less/utils";
         isPlainObject(toVal) &&
         isPlainObject(fromVal)
       ) {
-        merge(toVal, fromVal)
+        mergeData(toVal, fromVal)
+      }
+    }
+    return to
+  }
+
+  /**
+   * Data
+   * @param parentVal
+   * @param childVal
+   * @param vm
+   * @return {*}
+   */
+  function mergeDataOrFn (
+    parentVal,
+    childVal,
+    vm
+  ) {
+    if (!vm) {
+      // in a Vue.extend merge, both should be functions
+      if (!childVal) {
+        return parentVal
+      }
+      if (!parentVal) {
+        return childVal
+      }
+      /**
+       * when parentVal & childVal are both present,
+       * we need to return a function that returns the
+       * merged result of both functions... no need to check if parentVal is
+       * a function here because it has to be a function to pass previous merges.
+       */
+      return function mergeDataFn () {
+        return mergeData(
+          typeof childVal === 'function' ? childVal.call(this, this) : childVal,
+          typeof parentVal === 'function' ? parentVal.call(this, this) : parentVal
+        )
+      }
+    } else {
+      return function mergedInstanceDataFn () {
+        // instance merge
+        const instanceData = typeof childVal === 'function'
+          ? childVal.call(vm, vm)
+          : childVal
+        const defaultData = typeof parentVal === 'function'
+          ? parentVal.call(vm, vm)
+          : parentVal
+        if (instanceData) {
+          return mergeData(instanceData, defaultData)
+        } else {
+          return defaultData
+        }
       }
     }
   }
 
+  strats.data = function (
+    parentVal,
+    childVal,
+    vm
+  ) {
+    if (!vm) {
+      if (childVal && typeof childVal !== 'function') {
+        warn(
+          'The "data" option should bo a function ' +
+          'that returns a per-instance value in component ' +
+          'definitions.',
+          vm
+        )
+        return parentVal
+      }
+      return mergeDataOrFn(parentVal, childVal)
+    }
 
+    return mergeDataOrFn(parentVal, childVal, vm)
+  }
 
+  /**
+   * Hooks and props are merged as array.
+   * @param parentVal
+   * @param childVal
+   * @return {*}
+   */
+  function mergeHook (
+    parentVal,
+    childVal
+  ) {
+    const res = childVal
+     ? parentVal
+        ? parentVal.concat(childVal)
+        : Array.isArray(childVal)
+          ? childVal
+          : [ childVal ]
+      : parentVal
+    return res
+      ? dedupeHooks(res)
+      : res
+  }
 
+  function dedupeHooks (hooks) {
+    let res = []
+    for (let i = 0; i < hooks.length; i++) {
+      if (res.indexOf(hooks[i]) === -1) {
+        res.push(hooks[i])
+      }
+    }
+    return res
+  }
 
+  LIFECYCLE_HOOKS.forEach(function (hook) {
+    strats[hook] = mergeHook
+  })
 
+  /**
+   * Assets
+   * When a vm is present (instance creation), we need to do
+   * a three-way merge between constructor options, instance
+   * options and parent options.
+   *
+   * @param parentVal
+   * @param childVal
+   * @param vm
+   * @param key
+   * @return {*|null}
+   */
+  function mergeAssets (
+    parentVal,
+    childVal,
+    vm,
+    key
+  ) {
+    const res = Object.create(parentVal || null)
+    if (childVal) {
+      assertObjectType(key, childVal, vm)
+      return extend(res, childVal)
+    } else {
+      return res
+    }
+
+  }
+
+  ASSET_TYPES.forEach(function (type) {
+    strats[type + 's'] = mergeAssets
+  })
+
+  strats.watch = function (
+    parentVal,
+    childVal,
+    vm,
+    key
+  ) {
+    // work around Firefox's Object.prototype.watch...
+    if (parentVal === nativeWatch) {
+      parentVal = undefined
+    }
+    if (childVal === nativeWatch) {
+      childVal = undefined
+    }
+    if (!childVal) {
+      return Object.create(parentVal || null)
+    }
+    {
+      assertObjectType(key, childVal, vm)
+    }
+    if (!parentVal) {
+      return childVal
+    }
+    let ret = {}
+    extend(ret, parentVal)
+    for (let key$1 in childVal) {
+      let parent = ret[key$1]
+      let child = childVal[key$1]
+      if (parent && !Array.isArray(parent)) {
+        parent = [ parent ]
+      }
+      ret[key$1] = parent
+        ? parent.concat(child)
+        : Array.isArray(child) ? child : [ child ]
+    }
+    return ret
+  }
+
+  /**
+   * Other object hashes
+   */
+  strats.props =
+  strats.methods =
+  strats.inject =
+  strats.computed = function (
+    parentVal,
+    childVal,
+    vm,
+    key
+  ) {
+    if (childVal && 'development' !== 'production') {
+      assetObjectType(key, childVal, vm)
+    }
+    if (!parentVal) {
+      return childVal
+    }
+    let ret = Object.create(null)
+    extend(ret, parentVal)
+    if (childVal) {
+      extend(ret, childVal)
+      return ret
+    }
+  }
+  strats.provide = mergeDataOrFn
+
+  /**
+   * Default strategy
+   * @param parentVal
+   * @param childVal
+   * @return {*}
+   */
+  const defaultStrat = function (parentVal, childVal) {
+    return childVal === undefined
+      ? parentVal
+      : childVal
+  }
+
+  /**
+   * Validate component names
+   * @param options
+   */
+  function checkComponents (options) {
+    for (let key in options.components) {
+      validateComponentName(key)
+    }
+
+  }
+
+  function validateComponentName (name) {
+    if (!new RegExp(("^[a-zA-Z][\\-\\.0-9_" + (unicodeRegExp.source) + "]*$")).test(name)) {
+      warn(
+        'Invalid component name: "' + name + '". Component names' +
+        'should conform to valid custom element name in html5 specification.'
+      )
+    }
+    if (isBuiltInTag(name) || config.isReservedTag(name)) {
+      warn(
+        'Do not use build-in or reserved HTML elements as component' +
+        'id: ' + name
+      )
+    }
+  }
+
+  function normalizeProps (options, vm) {
+    const props = options.props
+    if (!props) {
+      return
+    }
+    let res = {}
+    let i, val, name
+    if (Array.isArray(props)) {
+      i = props.length
+      while (i--) {
+        val = props[i]
+        if (typeof val === 'string') {
+          name = camelize(val)
+          res[name] = { type: null }
+        } else {
+          warn('props must bo strings when using array syntax.')
+        }
+      }
+    } else if (isPlainObject(props)) {
+      for (let key in props) {
+        val = props[key]
+        name = camelize(key)
+        res[name] = isPlainObject(val)
+          ? val
+          : { type: val }
+      }
+    } else {
+      warn(
+        'Invalid value for option \"props\": expected an Array or an Object, ' +
+        'but got ' + (toRawType(props)) + '.',
+        vm
+      )
+    }
+    options.props = res
+  }
+
+  /**
+   * Normalize all injections into Object-based format
+   * @param options
+   * @param vm
+   */
+  function normalizeInject (options, vm) {
+    const inject = options.inject
+    if (!inject) {
+      return
+    }
+    let normalized = options.inject = {}
+    if (Array.isArray(inject)) {
+      for (let i = 0; i < inject.length; i++) {
+        normalized[inject[i]] = { from: inject[i] }
+      }
+    } else if (isPlainObject(inject)) {
+      for (let key in inject) {
+        let val = inject[key]
+        normalized[key] = isPlainObject(val)
+          ? extend({ from: key }, val)
+          : { from: val }
+      }
+    } else {
+      warn(
+        'Invalid value for option \"inject\": expected an Array or an Object, ' +
+        'but got ' + (toRowType(inject)) + '.',
+        vm
+      )
+    }
+  }
+
+  /**
+   * Normalize raw function directives into object format
+   * @param options
+   */
+  function normalizeDirectives (options) {
+    const dirs = options.directives
+    if (dirs) {
+      for (let key in dirs) {
+        let def$$1 = dirs[key]
+        if (typeof def$$1 === 'function') {
+          dirs[key] = { bind: def$$1, update: def$$1 }
+        }
+      }
+    }
+  }
+
+  function assertObjectType (name, value, vm) {
+    if (!isPlainObject(value)) {
+      warn(
+        'Invalid value for option \"' + name + '\": expected an Array or an Object, ' +
+        'but got ' + (toRowType(value)) + '.',
+        vm
+      )
+    }
+  }
+
+  /**
+   * Merge two option objects into a new one.
+   * Core utility used in both instantiation and inheritance.
+   * @param parent
+   * @param child
+   * @param vm
+   */
+  function mergeOptions (
+    parent,
+    child,
+    vm
+  ) {
+    {
+      checkComponents(child)
+    }
+
+    if (typeof child === 'function') {
+      child = child.options
+    }
+
+    normalizeProps(child, vm)
+    normalizeInject(child, vm)
+    normalizeDirectives(child, vm)
+
+    /**
+     * Apply extends and mixins on the child options,
+     * but only if it is a raw options object that isn't
+     * the result of another mergeOptions call.
+     * Only merged options has the_base property.
+     */
+    if (!child._base) {
+      if (child.extends) {
+        parent = mergeOptions(parent, child.extends, vm)
+      }
+      if (child.mixins) {
+        for (let i = 0; i < child.mixins.length; i++) {
+          parent = mergeOptions(parent, child.mixins[i], vm)
+        }
+      }
+    }
+
+    let options = {}
+    let key
+    for (key in parent) {
+      mergeField(key)
+    }
+    for (key in child) {
+      if (!hasOwn(parent, key)) {
+        mergeField(key)
+      }
+    }
+    function mergeField (key) {
+      const strat = strats[key] || defaultStrat
+      options[key] = strat(parent[key], child[key], vm, key)
+    }
+    return options
+  }
 
 })
