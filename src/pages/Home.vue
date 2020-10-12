@@ -31,6 +31,9 @@
       <li>
         <router-link to="/map">地图</router-link>
       </li>
+      <li>
+        <router-link to="/pdf-viewer">pdf文件流显示</router-link>
+      </li>
     </ul>
   </div>
 </template>

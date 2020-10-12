@@ -3,27 +3,133 @@
  * @Date: 2020/8/3 19:07
  * @Description:
 -->
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta http-equiv="Content-Style-Type" content="text/css"/>
   <title>Title</title>
+  <style>
+    .medical-record {
+      text-align: center;
+      font-family: 'PingFang SC', "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+      width: 767px;
+      background-color: #ffffff;
+      padding: 80px 40px 70px;
+      margin: 0 auto;
+    }
+    .hos {
+      font-size: 14px;
+      color: #666666;
+      line-height: 14px;
+    }
+    .title {
+      margin-top: 12px;
+      font-size: 20px;
+      color: #333333;
+      letter-spacing: 24px;
+      line-height: 20px;
+    }
+    .patient-info {
+      border-top: 1px solid #D8D8D8;
+      border-bottom: 1px solid #D8D8D8;
+      padding: 4px 50px 16px 50px;
+      margin-top: 24px;
+    }
+    .patient-info .line {
+      margin-top: 12px;
+      text-align: left;
+    }
+    .patient-info .line .item {
+      text-align: left;
+      display: inline-block;
+      width: 32%;
+      font-size: 14px;
+      color: #333333;
+      letter-spacing: 0;
+      line-height: 14px;
+    }
+    .main-info {
+      padding: 10px 20px 50px 0;
+    }
+    .main-info .item {
+      display: flex;
+      margin-top: 16px;
+    }
+    .main-info .item .key {
+      font-weight: bold;
+      display: inline-block;
+      text-align: right;
+      width: 100px;
+      font-size: 14px;
+      color: #333333;
+      letter-spacing: 0;
+      line-height: 14px;
+    }
+    .main-info .item .value{
+      margin-left: 20px;
+      text-align: left;
+      font-size: 14px;
+      color: #333333;
+      letter-spacing: 0;
+      line-height: 14px;
+    }
+    .sign {
+      margin-right: 100px;
+      float: right;
+      font-size: 14px;
+      color: #333333;
+      letter-spacing: 0;
+    }
+  </style>
 </head>
 <body>
-<button id="btn">下载</button>
-<a href="https://zlwyl-dev.iflyhealth.com/swift/v1/pb/301752590336.TXT" download="download">下载文件</a>
-<script>
-  const btn = document.getElementById('btn')
-  window.addEventListener('click', function (e) {
-    createDownloadIframe()
-  })
-  function createDownloadIframe () {
-    const url = 'https://zlwyl-dev.iflyhealth.com/swift/v1/pb/301752590336.txt'
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    iframe.src = "javascript: '<script>location.href=\"" + url + "\"<\/script>'"
-    document.getElementsByTagName('body')[0].appendChild(iframe)
-  }
-</script>
+<div class="medical-record">
+  <div class="hos">${userDoc.hosName}</div>
+  <div class="title">电子病历</div>
+  <div class="patient-info">
+    <div class="line">
+      <div class="item">姓名：${compatName} </div>
+      <div class="item">性别：
+        <#if compatGender == 'M'>男
+        <#elseif compatGender == 'F'>女
+        <#else>未知
+        </#if>
+      </div>
+      <div class="item">年龄：${compatAge}</div>
+    </div>
+    <div class="line">
+      <div class="item">科室：${bookDeptName} </div>
+      <div class="item"> 记录时间：${outpatientTime?string('yyyy-MM-dd  HH:mm')} </div>
+    </div>
+  </div>
+  <div class="main-info">
+    <div class="item">
+      <span class="key">主诉</span>
+      <span class="value">${diseaseDescription}</span>
+    </div>
+    <div class="item">
+      <span class="key">现病史</span>
+      <span class="value">${nowHistory}</span>
+    </div>
+    <div class="item">
+      <span class="key">既往史</span>
+      <span class="value">${pastHistory}</span>
+    </div>
+    <div class="item">
+      <span class="key">过敏史</span>
+      <span class="value">${allergyHistory}</span>
+    </div>
+    <div class="item">
+      <span class="key">诊断</span>
+      <span class="value">${diagnosisName}</span>
+    </div>
+    <div class="item">
+      <span class="key">诊疗意见</span>
+      <span class="value">${opinion}</span>
+    </div>
+  </div>
+  <div class="sign">医师签名：</div>
+</div>
 </body>
 </html>

@@ -67,6 +67,11 @@ const routes = [
     name: 'tabExit',
     component: () => import('../pages/AnHuiMap')
   },
+  {
+    path: '/pdf-viewer',
+    name: 'pdfViewer',
+    component: () => import('../pages/PdfViewer')
+  },
 ]
 
 const router = new VueRouter({

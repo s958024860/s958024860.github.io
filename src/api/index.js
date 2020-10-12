@@ -5,6 +5,7 @@
  */
 import httpInstance from './httpInstance'
 export * from './member'
+export * from './file'
 
 export function getKeyList () {
   return httpInstance.get('/key/list')
