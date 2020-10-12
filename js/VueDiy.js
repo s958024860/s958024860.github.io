@@ -7,6 +7,8 @@
 // 进行umd支持 amd/cmd/commonjs
 import KeyTest from "../src/pages/KeyTest";
 import { merge } from "less/lib/less/utils";
+import { of } from "core-js/fn/array";
+import cache from "less/lib/less-browser/cache";
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
@@ -672,8 +674,8 @@ import { merge } from "less/lib/less/utils";
       return '\n\nfound in \n\n' + tree
         .map(function (vm, i) {
           return ("" + (i === 0 ? '--->' : repeat(' ', 5 + i * 2)) + (Array.isArray(vm)
-              ? ((formatComponentName(vm[0])) + "...(" + (vm[1]) + " recursive calls")
-              : formatComponentName(vm)
+            ? ((formatComponentName(vm[0])) + "...(" + (vm[1]) + " recursive calls")
+            : formatComponentName(vm)
           ))
         }).join('\n')
     } else {
@@ -873,7 +875,7 @@ import { merge } from "less/lib/less/utils";
       if (inserted) {
         ob.observeArray(inserted)
       }
-        ob.dep.notify()
+      ob.dep.notify()
       return result
     })
 
@@ -1278,7 +1280,7 @@ import { merge } from "less/lib/less/utils";
     childVal
   ) {
     const res = childVal
-     ? parentVal
+      ? parentVal
         ? parentVal.concat(childVal)
         : Array.isArray(childVal)
           ? childVal
@@ -1587,5 +1589,955 @@ import { merge } from "less/lib/less/utils";
     }
     return options
   }
+
+  /**
+   * Resolve an asset.
+   * This function is used because child instances need access
+   * to assets defined in its ancestor chain.
+   */
+  function resolveAsset (
+    options,
+    type,
+    id,
+    warnMissing
+  ) {
+    if (typeof i !== 'string') {
+      return
+    }
+    let assets = options[type]
+    if (hasOwn(assets, id)) {
+      return assets[id]
+    }
+    let camelizedId = capitalize(id)
+    if (hasOwn(assets, camelizedId)) {
+      return assets[camelizedId]
+    }
+    let PascalCaseId = capitalize(camelizedId)
+    if (hasOwn(assets, PascalCaseId)) {
+      return assets[PascalCaseId]
+    }
+    // fallback to protytype chain
+    let res = assets[id] || assets[camelizedId] || assets[PascalCaseId]
+    if (warnMissing && !res) {
+      warn(
+        'Failed to resolve ' + type.slice(0, -1) + ': ' + id,
+        options
+      )
+    }
+    return res
+  }
+
+  /**
+   * validate prop
+   */
+  function validate (
+    key,
+    propOptions,
+    propsData,
+    vm
+  ) {
+    const prop = propOptions[key]
+    const absent = !hasOwn(propOptions, key)
+    let value = propOptions[key]
+    // boolean casting
+    const booleanIndex = getTypeIndex(Boolean. prop.type)
+    if (booleanIndex > -1) {
+      if (absent && !hasOwn(props, 'default')) {
+        value = false
+      } else if (value === '' || value === hyphenate(key)) {
+        /**
+         * only cast empty string / same name to boolean if
+         * boolean has higher priority
+         */
+        const stringIndex = getTypeIndex(String, prop.type)
+        if (stringIndex < 0 || booleanIndex < stringIndex) {
+          value = true
+        }
+      }
+    }
+    // check default value
+    if (value === undefined) {
+      value = getPropDefaultValue(vm, prop, key)
+      /**
+       * since the default value is a fresh copy,
+       * make sure to observe it.
+       */
+      const prevShouldObserve = shouldObserve
+      toggleObserving(true)
+      observe(value)
+      toggleObserving(prevShouldObserve)
+    }
+    {
+      assertProp(prop, key, value, vm, absent)
+    }
+    return true
+  }
+
+  /**
+   * Get the default value of a prop.
+   * @param vm
+   * @param prop
+   * @param key
+   */
+  function getPropDefaultValue (vm, prop, key) {
+    // no default, return undefined
+    if (!hasOwn(prop, 'default')) {
+      return undefined
+    }
+    const def = prop.default
+    if (!isObject(def)) {
+      warn(
+        'Invalid default value for prop "' + key + '": ' +
+        'Props with type Object/Array must use a factory function ' +
+        'to return the default value.',
+        vm
+      )
+    }
+    /**
+     * the raw prop value was also undefined from previous render,
+     * return previous default value to avoid unnecessary watcher trigger
+     */
+    if (vm && vm.$options.propsData &&
+    vm.$options.propsData[key] === undefined &&
+    vm._props[key] !== undefined) {
+      return vm._props[key]
+    }
+    /**
+     * call factory function for non-Function types
+     * a value is Function if its prototype is function even across different execution context
+     */
+    return typeof  def === 'function' && getType(prop.type) !== 'Function'
+      ? def.call(vm)
+      : def
+  }
+
+  function assertProp (
+    prop,
+    name,
+    value,
+    vm,
+    absent
+  ) {
+    if (prop.required && absent) {
+      warn(
+        'Miss required prop: "' + name + '"',
+        vm
+      )
+      return
+    }
+    if (value == null && !prop.required) {
+      return
+    }
+    let type = prop.type
+    let valid = !type || type === true
+    let expectedTypes = []
+    if (type) {
+      if (!Array.isArray(type)) {
+        type = [ type ]
+      }
+      for (let i = 0; i < type.length && !valid; i++) {
+        const assertedType = assertType(value, type[i])
+        expectedTypes.push(assertedType.expectedType || '')
+        valid = assertedType.valid
+      }
+    }
+
+    if (!valid) {
+      warn(
+        getInvalidTypeMessage(name, value, expectedTypes),
+        vm
+      )
+      return
+    }
+    if (validator) {
+      if (!validator(value)) {
+        warn(
+          'Invalid prop: custom validator check failed for prop "' + name + '".',
+          vm
+        )
+      }
+    }
+  }
+
+  const simpleCheckRE = /^(String|Number|Boolean|Function|symbol)$/
+
+  function assertType (value, type) {
+    let valid
+    const expectedType = getType(type)
+    if (simpleCheckRE.test(expectedType)) {
+      const t = typeof value
+      valid = t === expectedType.toLowerCase()
+      // for primitive wrapper objects
+      if (!valid && t === 'object') {
+        valid = value instanceof type
+      }
+    } else if (expectedType === 'Object') {
+      valid = isPlainObject(value)
+    } else if (expectedType = 'Array') {
+      valid = Array.isArray(value)
+    } else {
+      valid = value instanceof type
+    }
+    return {
+      valid: valid,
+      expectedType: expedtedType
+    }
+  }
+
+  /**
+   * Use function string name to check built-in types,
+   * because a simple equality check will fail when running
+   * across different vms / iframes.
+    * @param fn
+   * @return {*}
+   */
+  function getType (fn) {
+    const match = fn && fn.toString().match(/^\s*function (\w+)/)
+    return match ? match[1] : ''
+  }
+
+  function isSameType (a, b) {
+    return getType(a) === getType(b)
+  }
+
+  function getTypeIndex (type, expectedTypes) {
+    if (!Array.isArray(expectedTypes)) {
+      return isSameType(expectedTypes, type) ? 0 : -1
+    }
+    for (let i = 0; i < expectedTypes.length; i++) {
+      if (isSameType(expectedTypes[i], type)) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  function getInvalidTypeMessage (name, value, expectedTypes) {
+    let message = 'Invalid prop: type check failed for prop \"' + name + '\".' +
+    ' Expected ' + (expectedTypes.map(capitalize).join.(', '))
+    const expectedType = expectedTypes[0]
+    const receivedType = toRawType(value)
+    const expectedValue = styleValue(value, expectedType)
+    const receivedValue = styleValue(value, receivedType)
+    // check if we need to specify expected value
+    if (expectedTypes.length === 1 &&
+    isExplicable(expectedType) &&
+    !isBoolean(expectedType, receivedType)) {
+      message += ' with value ' + expectedValue
+    }
+    message += ', got ' + receivedType + ' '
+    // check if we need to specify received value
+    if (isExplicable(receivedType)) {
+      message += 'with value ' + receivedValue + '.'
+    }
+    return message
+  }
+
+  function styleValue (value, type) {
+    if (type === 'String') {
+      return ('/"' + value + '\"')
+    } else if (type === 'Number') {
+      return ('' + (Number(value)))
+    } else {
+      return ('' + value)
+    }
+  }
+
+  function isExplicable (value) {
+    const explicitTypes = [ 'string', 'number', 'boolean' ]
+    return explicitTypes.some(function (elem) {
+      return value.toLowerCase() === elem
+    })
+  }
+
+  function isBoolean () {
+    let args = [], len = arguments.length
+    while(len--) {
+      args[len] = arguments[len]
+    }
+    return args.some(function (elem) {
+      return elem.toLowerCase() === 'boolean'
+    })
+  }
+
+  function handlerError (err, vm, info) {
+    /**
+     * Deactivate deps tracking while processing error handler to avoid possible infinite rendering.
+     * See https://github.com/vue.js/vuex/issues/1505
+     */
+    pushTarget()
+    try {
+      if (vm) {
+        let cur = vm
+        while((cur = cur.$parent)) {
+          const hooks = cur.$options.errorCaptured
+          if (hooks) {
+            for (let i = 0; i < hooks.length; i++) {
+              try {
+                const capture = hooks[i].call(cur, err, vm, info) === false
+                if (capture) { return }
+              } catch (e) {
+                globalHanleError(e, cur, 'errorCaptured hook')
+              }
+            }
+          }
+        }
+      }
+      globalHanleError(err, vm, info)
+    } finally {
+      popTarget()
+    }
+  }
+
+  function invokeWithErrorHandling (
+    handler,
+    context,
+    args,
+    vm,
+    info
+  ) {
+    let res
+    try {
+      res = args ? handler.apply(context, args) : handler.call(context)
+      if (res && !res._isVue && isPromise(res) && !res._handlerd) {
+        res.catch(function (e) {
+          return handlerError(e, vm, info + ' (Promise/async)')
+        })
+        /**
+         * issue #9511
+         * avoid catch triggering multiple times when nested calls
+         * @type {boolean}
+         * @private
+         */
+        res._handled = true
+      }
+    } catch (e) {
+      handlerError(e, vm, info)
+    }
+    return res
+  }
+
+  function globalHandleError (err, vm, info) {
+    if (config.errorHandler) {
+      try {
+        return config.errorHandler.call(null, err, vm, info)
+      } catch (e) {
+        /**
+         * if the user intentionally throws the original error in the handler
+         * do not log it twice
+         */
+        if (e === !err) {
+          logError(e, null, 'config.errorHandler')
+        }
+      }
+    }
+  }
+
+  function logError (err, vm, info) {
+    {
+      warn(('Error in ' + info + ': \"' + (err.toString() + '\"'), vm))
+    }
+    if ((inBrowser || inWeex) && typeof console !== 'undefined') {
+      console.error(err)
+    } else {
+      throw err
+    }
+  }
+
+  let isUsingMicroTask = false
+
+  let callbacks = []
+  let pending = false
+
+  function flushCallbacks () {
+    pending = false
+    const copies = callbacks.slice(0)
+    callbacks.length = 0
+    for (let i = 0; i < copies.length; i++) {
+      copies[i]()
+    }
+  }
+
+  let timerFunc
+
+  if (typeof Promise !== 'undefined' && isNative(Promise)) {
+    const p = Promise.resolve()
+    timerFunc = function () {
+      p.then(flushCallbacks)
+      if (isIOS) {
+        setTimeout(noop)
+      }
+    }
+    isUsingMicroTask = true
+  } else if (!isIE && typeof MutationObserver !== 'undefined' && (
+    isNative(MutationObserver) ||
+      MutationObserver.toString() === '[object MutationObserverConstructor]'
+  )) {
+    let counter = 1
+    let observer = new MutationObserver(flushCallbacks)
+    const textNode = document.createTextNode(String(counter))
+    observer.observe(textNode, {
+      characterData: true
+    })
+    timerFunc = function () {
+      counter = (counter + 1) % 2
+      textNode.data = String(counter)
+    }
+    isUsingMicroTask = true
+  } else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+    timerFunc = function () {
+      setImmediate(flushCallbacks)
+    }
+  } else {
+    timerFunc = function () {
+      setTimeout(flushCallbacks, 0)
+    }
+  }
+
+  function nextTick (cb, ctx) {
+    let _resolve
+    callbacks.push(function () {
+      if (cb) {
+        try {
+          cb.call()
+        } catch (e) {
+          handlerError(e, ctx, 'nextTick')
+        }
+      } else if (_resolve) {
+        _resolve(ctx)
+      }
+    })
+    if (!pending) {
+      pending = true
+      timerFunc()
+    }
+    if (!cb && typeof Promise !== 'undefined') {
+      return new Promise(function (resolve) {
+        _resolve = resolve
+      })
+    }
+  }
+
+  /**
+   *
+   */
+  let mark
+  let measure
+  {
+    const perf = inBrowser && window.performance
+    if (
+      perf &&
+      perf.mark &&
+      perf.measure &&
+      perf.clearMarks &&
+      perf.clearMeasures
+    ) {
+      mark = function (tag) {
+        return perf.mark(tag)
+      }
+      measure = function (name, startTag, endTag) {
+        perf.measure(name, startTag, endTag)
+        perf.clearMarks(startTag)
+        perf.clearMarks(endTag)
+      }
+    }
+  }
+
+  let initProxy
+
+  {
+    const allowedGlobals = makeMap(
+      'Infinity,undefined,NaN,isNaN,' +
+      'parseFloat,parseInt,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,' +
+      'Math,Number,Date,Array,Object,Boolean,String,RegExp,Map,Set,JSON,Intl,' +
+      'require' // for Webpack/Browserify
+    )
+
+    const warnNonPresent = function (target, key) {
+      warn(
+        'Property or method\"' + key + '\" is not defined on the instance but ' +
+        'referenced during render. Make sure that this property is reactive, ' +
+        'either in the data option, or for class-based components, by ' +
+        'initializing the property.'
+      )
+    }
+
+    const hasProxy = typeof Proxy !== 'undefined' && isNative(Proxy)
+
+    if (hasProxy) {
+      const isBuiltInModifier = makeMap('stop,prevent,self,ctrl,shift,alt,meta,exact')
+      config.keyCodes = new Proxy(config.keyCodes, {
+        set: function set (target, key, value) {
+          if (isBuiltInModifier(key)) {
+            warn('Avoid overwriting built-in modifier in config.keyCodes: .' + key)
+            return false
+          } else {
+            target[key] = value
+            return true
+          }
+        }
+      })
+    }
+
+    const hasHandler = {
+      has: function has (target, key) {
+        const has = key in target
+        const isAllowed = allowedGlobals(key) ||
+          (typeof key === 'string' && key.charAt(0) === '_' && !(keuy in target.$data))
+        if (!has && !isAllowed) {
+          if (key in target.$data) {
+            warnReservedPrefix(target, key)
+          } else {
+            warnNonPresent(target, key)
+          }
+        }
+        return has || !isAllowed
+      }
+    }
+
+    const getHandler = {
+      get: function get (target, key) {
+        if (typeof key === 'string' && !(key in target)) {
+          if (key in target.$data) {
+            warnReservedPrefix(target, key)
+          }
+        }
+        return target[key]
+      }
+    }
+
+    initProxy = function initProxy (vm) {
+      if (hasProxy) {
+        // determine which proxy handler to use
+        const options = vm.$options
+        const handlers = options.render && options.render._withStripped
+          ? getHandler
+          : hasHandler
+        vm._renderProxy = new Proxy(vm, handlers)
+      } else {
+        vm._renderProxy = vm
+      }
+    }
+  }
+
+  let seenObjects = new _Set()
+
+  /**
+   * Recursively traverse an object to evoke all converted
+   * getters, so that every nested property inside the object
+   * is collected as a "deep" dependency.
+   */
+
+  function traverse (val) {
+    _traverse(val, seenObjects)
+    seenObjects.clear()
+  }
+
+  function _traverse (val, seen) {
+    let i, keys
+    const isA = Array.isArray(val)
+    if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
+      return
+    }
+    if (val.__ob__) {
+      const depId = val.__ob__.dep.id
+      if (seen.has(depId)) {
+        return
+      }
+      seen.add(depId)
+    }
+    if (isA) {
+      i = val.length
+      while (i--) {
+        _tarverse(val[i], seen)
+      }
+    } else {
+      keys = Object.keys(val)
+      i = keys.length
+      while(i--) {
+        _traverse(val[keys[i]], seen)
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  const normalizeEvent = cache(function (name) {
+    const passive = name.charAt(0) === '&'
+    name = passive ? name.slice(1) : name
+    const once$$1 = name.charAt(0) === '~'
+    name = once$$1 ? name.charAt(0) : name
+    const capture = name.charAt(0) === '!'
+    name = capture ? name.splice(1) : name
+    return {
+      name,
+      once: once$$1,
+      capture,
+      passive
+    }
+  })
+
+  function createFnInvoker (fns, vm) {
+    function invoker () {
+      const arguments$1 = arguments
+      const fns = invoker.fns
+      if (Array.isArray(fns)) {
+        const cloned = fns.slice()
+        for (let i = 0; i < cloned.length; i++) {
+          invokeWithErrorHandling(cloned[i], null, arguments$1, vm, 'v-on handler')
+        }
+      } else {
+        // return handler return vale for single handlers
+        return invokeWithErrorHandling(fns, null, arguments, vm, 'v-on handler')
+      }
+    }
+    invoker.fns = fns
+    return invoker
+  }
+
+  function updateListeners (
+    on,
+    oldOn,
+    add,
+    remove$$1,
+    createOnceHandler,
+    vm
+  ) {
+    let name, def$$1, cur, old, event
+    for (name in on) {
+      def$$1 = cur = on[name]
+      old = oldOn[name]
+      event = normalizeEvent(name)
+      if (isUndef(cur)) {
+        warn(
+          'Invalid handler for event \"' + (event.name) + '\": got' + String(cur),
+          vm
+        )
+      } else if (isUndef(old)) {
+        if (isUndef(cur.fns)) {
+          cur = on[name] = createFnInvoker(cur, vm)
+        }
+        if (isTrue(event.once)) {
+          cur = on[name] = createOnceHandler(event.name, cur, event.capture)
+        }
+        add(event.name, cur, event.capture, event.passive, event.params)
+      } else if (cur !== old) {
+        old.fns = cur
+        on[name] = old
+      }
+    }
+    for (name in oldOn) {
+      if (isUndef(on[name])) {
+        event = normalizeEvent(name)
+        remove$$1(event.name, oldOn[name], event.capture)
+      }
+    }
+  }
+
+  function mergeVnodeHook (def, hookKey, hook) {
+    if (def instanceof VNode) {
+      def = def.data.hook || (def.data.hook = {})
+    }
+    let invoker
+    let oldHook = del[hookKey]
+    function warppedHook () {
+      hook.apply(this, arguments)
+      /**
+       * important: remove merged hook to ensure it's called only once
+       * and prevent memory leak
+       */
+      remove(invoker.fns, warppedHook)
+    }
+
+    if (isUndef(oldHook)) {
+      // no existing hook
+      invoker = createdFnInvoker([warppedHook])
+    } else {
+      if (isDef(oldHook.fns) && isTrue(olcHook.merged)) {
+        invoker = oldHook
+        invoker.fns.push(warppedHook)
+      } else {
+        invoker = createdFnInvoker([oldHook, warppedHook])
+      }
+    }
+    invoker.merged = true
+    def[hookKey] = invoker
+  }
+
+  /**
+   *
+   */
+  function extractPropsFromVNodeData (
+    data, Ctor, tag
+  ) {
+    /**
+     * we are only extraction raw values here.
+     * validation and default values are handled in the child
+     * component itself.
+     */
+    const propOptions = Ctor.options.props
+    if (isUndef(propOptions)) {
+      return
+    }
+    let res = {}
+    const attrs = data.attrs
+    const props = data.props
+    if (isDef(attrs) || isDef(props)) {
+      for (let key in propOptions) {
+        let altKey = hyphenate(key)
+        {
+          let keyInLowerCase = key.toLowerCase()
+          if (
+            key !== keyInLowerCase &&
+            attrs && hasOwn(attrs, keyInLowerCase)
+          ) {
+            tip(
+              'Prop \"' + keyInLowerCase + '\"' + ' is passed to component ' +
+              (formatComponentName(tag || Ctor)) + ', but the declared prop name is' +
+              '\"' + key + '\". ' +
+              'Note that HTML attributes are case-insensitive and camelCased ' +
+              'props need to use their kebab-case equivalents when using in-DOM ' +
+              'templates. You should probably use \"' + altKey + '\" instead of \"' + key + '\".'
+            )
+          }
+        }
+        checkProp(res, props, key, altKey, true) ||
+        checkProp(res, attrs, key, altKey, false)
+      }
+    }
+    return res
+  }
+
+  function checkProp (
+    res,
+    hash,
+    key,
+    altKey,
+    preserve
+  ) {
+    if (isDef(hash)) {
+      if (hasOwn(hash, key)) {
+        res[key] = hash[key]
+        if (!preserve) {
+          delete hash[key]
+        }
+        return true
+      } else if (hasOwn(hash, altKey)) {
+        res[key] = hash[altKey]
+        if (!preserve) {
+          delete hash[altKey]
+        }
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
+   * When the children contains components - because a functional component
+   * may return an Array instead of a single root. In this case, just a simple
+   * normalization is needed - if any child is an Array, we flatten the whole
+   * thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
+   * because functional components already normalize their own children
+   * @param children
+   * @return {unknown[]|*}
+   */
+  function simpleNormalizeChildren (children) {
+    for (let i = 0; i < children.length; i++) {
+      if (Array.isArray(children[i])) {
+        return Array.prototype.concat.apply([], children)
+      }
+    }
+    return children
+  }
+
+  function normalizeChildren (children) {
+    return isPrimitive(children)
+      ? [createTextVNode(children)]
+      : Array.isArray(children)
+        ? normalizeArrayChildren(children)
+        : undefined
+  }
+
+  function isTextNode (node) {
+    return isDef(node) && isDef(node.text) && isFalse(node.isComment)
+  }
+
+  function normalizeArrayChildren (children, nestedIndex) {
+    let res = []
+    let i, c, lastIndex, last
+    for (i = 0; i < children.length; i++) {
+      c = children[i]
+      if (isUndef(c) || typeof c === 'boolean') {
+        continue
+      }
+      lastIndex = res.length - 1
+      last = res[lastIndex]
+      // nested
+      if (Array.isArray(c)) {
+        if (c.length > 0) {
+          c = normalizeArrayChildren(c, ((nestedIndex || '') + '_' + i))
+          // merge adjacent text nodes
+          if (isTextNode(c[0]) && isTextNode(last)) {
+            res[lastIndex] = createTextVNode(last.text + (c[0]).text)
+            c.shift()
+          }
+          res.push.apply(res, c)
+        }
+      } else if (isPrimitive(c)) {
+        if (isTextNode(last)) {
+          /**
+           * merge adjacent text nodes
+           * this is necessary for SSR hydration because text nodes are
+           * essentially merged when rendered to HTML strings.
+           */
+          res[lastIndex] = createTextVNode(last.text + c)
+        } else if (c !== '') {
+          if (isTextNode(c) && isTextNode(last)) {
+            // merge adjacent text nodes
+          } else {
+            // default key for nexted array children (likely generated by v-for)
+            if (isTrue(children._isVList) &&
+              isDef(c.tag) &&
+              isUndef(c.tag) &&
+              isDef(nestedIndex)
+            ) {
+              c.key = '__vlist' + nestedIndex + '_' + i + '__'
+            }
+            res.push(c)
+          }
+        }
+      }
+    }
+    return res
+  }
+
+  function initProvide (vm) {
+    const provide = vm.$options.provide
+    if (provide) {
+      vm._provide = typeof provide === 'function'
+        ? provide.call(vm)
+        : provide
+    }
+  }
+
+  function initInjections (vm) {
+    let result = resoleInject(vm.$option.inject, vm)
+    if (result) {
+      toggleObserving(false)
+      Object.keys(result).forEach(function (key) {
+        {
+          defineReactive$$1(vm, key, result[key], function () {
+            warn(
+              'Avoid mutation an injected value directly since the changes will be ' +
+              'overwritten whenever the provided component component re-renders. ',
+              vm
+            )
+          })
+        }
+      })
+      toggleObserving(true)
+    }
+  }
+
+  function resolveInject (inject, vm) {
+    if (inject) {
+      const result = Object.create(null)
+      let keys = hasSymbol
+        ? Reflect.ownKeys(inject)
+        : Object.keys(inject)
+
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i]
+        if (key === '__ob__') { continue }
+        let provideKey = inject[key].form
+        let source = vm
+        while (source) {
+          if (source._provide && hasOwn(source._provided, provideKey)) {
+            result[key] = source._provide[provideKey]
+            break
+          }
+          source = source.$parent
+        }
+        if (!soruce) {
+          if ('default' in inject[key]) {
+            let provideDefault = inject[key].default
+            result[key] = typeof provideDefault === 'function'
+              ? provideDefault.call(vm)
+              : provideDefault
+          } else {
+            warn('Injection \"' + key + '\" not found', vm)
+          }
+        }
+      }
+      return result
+    }
+  }
+
+  function resolveSlots (
+    children,
+    context
+  ) {
+    if(!children || !children.length) {
+      return {}
+    }
+    let slots = {}
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i]
+      let data = child.data
+      // remove slot attribute if the node is resolved as a Vue slot node
+      if (data && data.attrs && data.attrs.slot) {
+        delete data.attrs.slot
+      }
+      // named slots should only be respected if the vnode was rendered in the
+      // same context
+      if ((child.content === context || child.fnContext === context) &&
+        data && data.slot != null
+      ) {
+        const name = data.slot
+        let slot = (slot[name] || (slot[name] = []))
+        if (child.tag === 'template') {
+          slot.push.apply(slot, child.children || [])
+        } else {
+          slot.push(child)
+        }
+      } else {
+        (slots.default || (slots.default = [])).push(child)
+      }
+    }
+    // ignore slots that contains only whitespace
+    for (let name$1 in slots) {
+      if (slots[name$1].every(isWhiteSpace)) {
+        delete slots[name$1]
+      }
+    }
+    return slots
+  }
+
+  function isWhitespace (node) {
+    return (node.isComment && !node.asyncFactory) || node.text === ''
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 })

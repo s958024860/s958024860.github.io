@@ -13,12 +13,13 @@ module.exports = {
   lintOnSave: true,
   publicPath: './',
   devServer: {
+    https: true,
     host: '0.0.0.0',
     open: true,
     proxy: {
-      '/' : {
+      '/swift' : {
         changeOrigin: true,
-        target: 'http://localhost:8000/',
+        target: 'https://zlwyl-dev.iflyhealth.com',
       }
     }
   },
