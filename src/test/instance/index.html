@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script type="module">
+  import ModuleA from './moduleA.js'
+
+  const a = new ModuleA('sfz', '18')
+  a.speak()
+
+  const a1 = new ModuleA('nancy', '22')
+  a1.speak()
+  
+  console.log(a === a1)
+  
+</script>
+</body>
+</html>

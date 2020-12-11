@@ -1,8 +1,3 @@
-<!--
- * @Author: fzsong3
- * @Date: 2020/8/3 19:07
- * @Description:
--->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en">
 <head>
@@ -84,52 +79,12 @@
   </style>
 </head>
 <body>
-<div class="medical-record">
-  <div class="hos">${userDoc.hosName}</div>
-  <div class="title">电子病历</div>
-  <div class="patient-info">
-    <div class="line">
-      <div class="item">姓名：${compatName} </div>
-      <div class="item">性别：
-        <#if compatGender == 'M'>男
-        <#elseif compatGender == 'F'>女
-        <#else>未知
-        </#if>
-      </div>
-      <div class="item">年龄：${compatAge}</div>
-    </div>
-    <div class="line">
-      <div class="item">科室：${bookDeptName} </div>
-      <div class="item"> 记录时间：${outpatientTime?string('yyyy-MM-dd  HH:mm')} </div>
-    </div>
-  </div>
-  <div class="main-info">
-    <div class="item">
-      <span class="key">主诉</span>
-      <span class="value">${diseaseDescription}</span>
-    </div>
-    <div class="item">
-      <span class="key">现病史</span>
-      <span class="value">${nowHistory}</span>
-    </div>
-    <div class="item">
-      <span class="key">既往史</span>
-      <span class="value">${pastHistory}</span>
-    </div>
-    <div class="item">
-      <span class="key">过敏史</span>
-      <span class="value">${allergyHistory}</span>
-    </div>
-    <div class="item">
-      <span class="key">诊断</span>
-      <span class="value">${diagnosisName}</span>
-    </div>
-    <div class="item">
-      <span class="key">诊疗意见</span>
-      <span class="value">${opinion}</span>
-    </div>
-  </div>
-  <div class="sign">医师签名：</div>
-</div>
 </body>
+<script type="module">
+  import ModuleA from './instance/moduleA.js'
+
+  const a = new ModuleA('sfz', '18')
+
+  a.speak()
+</script>
 </html>
