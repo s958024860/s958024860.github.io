@@ -1,0 +1,39 @@
+<!--
+ * @Author: fzsong3
+ * @Date: 2021/2/21 16:00
+ * @Description:
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+  <div id="app">
+    <input type="text" v-model="message">
+    <div>
+      <p v-show="isShowNode" v-text="message"></p>
+    </div>
+    <button v-on:click="display">显示/隐藏</button>
+  </div>
+</body>
+<script type="module">
+  import Vue from './Vue.js'
+  const vm = new Vue({
+    el: '#app',
+    data () {
+      return {
+        message: 'this is test',
+        isShowNode: true
+      }
+    },
+    methods: {
+      display () {
+        this.data.isShowNode = !this.data.isShowNode
+      },
+    }
+  })
+
+</script>
+</html>
