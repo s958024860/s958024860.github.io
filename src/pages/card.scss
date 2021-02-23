@@ -1,0 +1,13 @@
+$map: (
+        box-1: #7EBAF3,
+        box-2: #80CBD8,
+        box-3: #E3C59B,
+        box-4: #E9AC94,
+        box-5: #E7CE83,
+);
+/* 遍历map */
+@each $key, $value in $map {
+  .#{$key} {
+    background: $value;
+  }
+}

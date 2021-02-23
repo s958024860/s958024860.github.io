@@ -1,5 +1,54 @@
-import ModuleA from './instance/moduleA.js'
+function statement (invoice, plays) {
+  let totalAmount = 0
+  let volumeCredits = 0
+  let result = `Statement for ${invoice.customer}\n`
+  const format = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  }).format
 
-const a = new ModuleA('sfz', '18')
+  for (let pref of invoice.performances) {
+    const play = playFor(pref)
+    let thisAmount = amountFor(pref, play)
+    // add volume credits
+    volumeCredits += Math.max(perf.audience - 30, 0)
+    // add extra credit for every ten comedy attendess
+    if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5)
 
-a.speak()
+    // print line for this order
+    result += `${play.name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`
+  }
+
+  result += `Amount owed is ${format(totalAmount/100)}\n`
+  result += `You earned ${volumeCredits} credits\n`
+  return result
+
+  function playFor (aPerformance) {
+    return plays[aPerformance.playID]
+  }
+
+  function amountFor (aPerformance, play) {
+    let result = 0
+    switch (play.type) {
+      case 'tragedy':
+        result = 40000
+        if (aPerformance.audience > 30) {
+          result += 1000 * (perf.audience - 30)
+        }
+        break
+      case 'comedy':
+        result = 30000
+        if (aPerformance.audience > 20) {
+          result += 10000 + 500 * (aPerformance.audience - 20)
+        }
+        result += 300 * aPerformance.audience
+        break
+      default:
+        throw new Error(`unknown type: ${play.type}`)
+
+    }
+    return result
+  }
+
+}

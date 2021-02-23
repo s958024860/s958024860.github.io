@@ -14,13 +14,9 @@ export default class Vue {
     this.methods = options.methods
     this.el = document.querySelector(options.el)
     // 响应式数据
-    this.reactive(this.data)
+    reactive(this.data)
     // 节点编译
-    this.compile(this.el, this)
+    compile(this.el, this)
   }
 
 }
-
-Vue.prototype.reactive = reactive
-
-Vue.prototype.compile = compile

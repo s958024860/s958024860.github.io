@@ -1,0 +1,41 @@
+<!--
+ * @Author: fzsong3
+ * @Date: 2020/12/26 11:03
+ * @Description:
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>css选择器优先级</title>
+  <link type="text/css" rel="stylesheet" href="test1.css">
+  <style>
+    .root {
+      background-color: #999999;
+      z-index: 0;
+    }
+    .position {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="position root">
+  <div id="box1" class="position"></div>
+  <div id="box2" class="position">
+    <div id="box2-1" class="position" style="z-index: 1;"></div>
+    <div id="box2-2" class="position" style="z-index: 2;"></div>
+  </div>
+  <div id="box3" class="position" style="z-index: 1;"></div>
+  <div id="box4" class="position" style="z-index: -1;"></div>
+  <div id="box5" class="position" style="z-index: 0;">
+    <div id="box5-1" class="position" style="z-index: 1;"></div>
+    <div id="box5-2" class="position" style="z-index: 2;"></div>
+  </div>
+</div>
+</body>
+</html>

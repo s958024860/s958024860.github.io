@@ -1,0 +1,21 @@
+<!--
+ * @Author: fzsong3
+ * @Date: 2021/1/29 16:28
+ * @Description:
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>初见层叠上下文</title>
+  </head>
+  <body>
+    <h3 class="root__header"></h3>
+    <div id="stacking-context1" style="position: relative; z-index: 2;"></div>
+    <span id="root-text"></span>
+    <div id="stacking-context2" style="position: relative; z-index: 1;">
+      <div id="stacking-context2__box" style="position: relative; z-index: 3;"></div>
+      <span id="stacking-context2-text"></span>
+    </div>
+  </body>
+</html>

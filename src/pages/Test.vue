@@ -5,66 +5,113 @@
 -->
 <template>
   <div class="test">
-    <el-select v-model="dataFieldCode" filterable @change="dataChanged">
-      <el-option
-        v-for="(item, index) in codeOptions"
-        :key="item.id"
-        :label="item.name"
-        :value="item.id"
+<!--    <draggable-->
+<!--      drag-class="drag-class"-->
+<!--      v-model="myArray"-->
+<!--      :group="{ name: '', pull: 'clone', put: false }"-->
+<!--      :sort="false"-->
+<!--      @change="log"-->
+<!--      @start="onStart"-->
+<!--      @end="onEnd"-->
+<!--    >-->
+<!--      <transition-group>-->
+<!--        -->
+<!--      </transition-group>-->
+<!--    </draggable>-->
+    <div
+      v-for="(element, index) in myArray"
+      :key="element.title"
+      style="position: relative; height: 100px;"
+    >
+      <div
+        class="box"
+        :class="`box-${index + 1}`"
+        @mouseover="mouseover(index)"
       >
-      </el-option>
-    </el-select>
+        {{ element.title }}123123
+      </div>
+      <div
+        v-if="dragIndex === index"
+        :style="`opacity: ${showIndex === index ? 1 : 0};`"
+        class="box box-cover"
+        :class="`box-${index + 1}`"
+        draggable="true"
+        @dragstart="dragstart(index)"
+        @dragend="dragend"
+      >
+        {{ element.title }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import TestChild from './TestChild'
+
+import draggable from 'vuedraggable'
+
 export default {
   name: 'Test',
-  components: { TestChild },
+  components: { draggable },
   data () {
     return {
-      dataFieldCode: '',
-      codeOptions: [
-        { name: 'sfz', id: 'sdf' },
-        { name: 'sfz1', id: 'sfz1' },
-        { name: 'sfz2', id: 'sfz2' },
-        { name: 'sfz3', id: 'sfz3' },
-        { name: 'sfz4', id: 'sfz4' },
-        { name: 'sfz5', id: 'sfz5' },
-        { name: 'sfz6', id: 'sfz6' },
+      dragIndex: -1,
+      showIndex: -1,
+      myArray: [
+        { title: '排班1', bgcolor: '#7EBAF3' },
+        { title: '排班2', bgcolor: '#80CBD8' },
+        { title: '排班3', bgcolor: '#E3C59B' },
+        { title: '排班4', bgcolor: '#E9AC94' },
+        { title: '排班5', bgcolor: '#E7CE83' },
       ]
     }
   },
   filters: {
-    testFormat (value) {
-      return value + '13245'
-    },
   },
   mounted () { },
   beforeDestroy () { },
   methods: {
-    dataChanged (item) {
-      console.log(item)
+    dragstart (index) {
+      this.showIndex = index
     },
-    diyTest (pram2, paramArr) {
-      console.log(pram2)
-      console.log(paramArr)
-      return paramArr + pram2
-    }
+    dragend () {
+      this.dragIndex = -1
+      this.showIndex = -1
+    },
+    mouseover (index) {
+      this.dragIndex = index
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .test {
+  @import "card";
   height: 100%;
   width: 100%;
   .box {
-    width: 200px;
+    width: 100px;
+    height: 100px;
+    position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    &:hover {
+      background-color: red;
+      border-radius: 4px;
+    }
+  }
+  .draggable {
+    position: absolute;
+    top: 0;
+    height: 0;
+  }
+  .drag-class {
+    height: 50px;
+    margin-bottom: 50px;
+  }
+  .box-cover {
+    height: 50px;
   }
 }
 </style>

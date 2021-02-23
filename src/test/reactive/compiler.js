@@ -22,6 +22,12 @@ export function compile (el, vm) {
   directives.forEach(directive => directive.bind())
 }
 
+/**
+ * 收集指令
+ * @param el
+ * @param vm
+ * @return {[]}
+ */
 function getDirectives (el, vm) {
   let directives = []
   if (el.attributes) {
