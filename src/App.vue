@@ -9,7 +9,7 @@
 export default {
   name: 'App',
   created () {
-    this.addWatermark()
+    // this.addWatermark()
     // this.addHighlight()
   },
   methods: {

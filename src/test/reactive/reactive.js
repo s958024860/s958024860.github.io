@@ -20,7 +20,6 @@ export function defineReactive (obj, key) {
     enumerable: true,
     configurable: true,
     get () {
-      console.log('执行了get方法', key, value)
       // 创建监听器进行依赖收集
       if (Dep.target) {
         dep.addSub(Dep.target)
@@ -29,7 +28,6 @@ export function defineReactive (obj, key) {
     },
     set (newValue) {
       if (value === newValue) return
-      console.log('执行了set方法', key, value, newValue)
       value = newValue
       dep.notify()
     }

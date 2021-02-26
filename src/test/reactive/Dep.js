@@ -3,6 +3,9 @@
  * @Date: 2021/2/19 16:24
  * @Description:
  */
+
+import { queueJob } from './next-tick.js'
+
 export class Dep {
 
   constructor () {
@@ -11,15 +14,13 @@ export class Dep {
 
   // 收集依赖
   addSub (watcher) {
+    // 存入依赖的回调函数
     this.subs.push(watcher)
   }
 
   // 监听触发
   notify () {
-    console.log('依赖仓库====', this.subs)
-    this.subs.forEach(watcher => {
-      watcher.update()
-    })
+    this.subs.forEach(watcher => queueJob(watcher))
   }
 
 }

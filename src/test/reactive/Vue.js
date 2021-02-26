@@ -6,12 +6,15 @@
 
 import { reactive } from './reactive.js'
 import { compile } from './compiler.js'
+import { nextTick } from './next-tick.js'
 
 export default class Vue {
   constructor (options) {
     this.options = options
     this.data = typeof options.data === 'function' ? options.data() : options.data
     this.methods = options.methods
+    // 异步更新队列
+    this.$nextTick = nextTick
     this.el = document.querySelector(options.el)
     // 响应式数据
     reactive(this.data)

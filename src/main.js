@@ -25,6 +25,8 @@ import MarkdownItVue from 'markdown-it-vue'
 import 'github-markdown-css/github-markdown.css'
 
 import App from './App.vue'
+// vconsole 移动端调试
+import VConsole from 'vconsole'
 
 // 注册全局组件 测试
 Vue.component('ButtonCounter', {
@@ -41,6 +43,7 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 Vue.prototype.axios = httpInstance
+Vue.prototype.$vConsole = new VConsole()
 
 new Vue({
   router,

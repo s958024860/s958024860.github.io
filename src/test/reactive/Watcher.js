@@ -6,6 +6,10 @@
 
 import { Dep } from './Dep.js';
 
+let uid = 0
+const p = Promise.resolve()
+let nextTick = cb => Promise.resolve().then(cb)
+
 export default class Watcher {
   /**
    * 构造器
@@ -13,23 +17,21 @@ export default class Watcher {
    * @param callback function
    */
   constructor (observe, callback) {
+    this.id = ++uid
     this.observe = observe
     this.callback = callback
     // 开始收集依赖
-    console.log('开始收集依赖========')
     Dep.target = this
     this.value = observe()
     // 收集完成释放
     Dep.target = null
-    console.log('收集完成释放========')
   }
 
   update () {
     const newValue = this.observe()
-    console.log('监听数据更新=======', this.value, newValue)
     if (newValue === this.value) return
     this.callback(newValue, this.value)
+    console.log('newValue==============', newValue)
     this.value = newValue
-    console.log('数据更新=========', this.value)
   }
 }

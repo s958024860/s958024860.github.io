@@ -6,6 +6,7 @@
 import Directive from './Directive.js'
 import { directiveMap } from './constants.js'
 
+
 export function compile (el, vm) {
   if (el.childNodes?.length) {
     for (let i = 0; i < el.childNodes.length; i++) {
@@ -13,6 +14,8 @@ export function compile (el, vm) {
       // node: element
       if (node.nodeType === 1) {
         compile(node, vm)
+      } else if (node.nodeType === 3) {
+        // todo
       }
     }
   }

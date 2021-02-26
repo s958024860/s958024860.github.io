@@ -16,14 +16,20 @@
       <p v-show="isShowNode" v-text="message"></p>
     </div>
     <button v-on:click="display">显示/隐藏</button>
+    <div>=====================</div>
+    <div v-text="changeMessage"></div>
+    <button v-on:click="changeMessage">修改message</button>
   </div>
 </body>
 <script type="module">
   import Vue from './Vue.js'
+  const template = document.querySelector('#app').outerHTML
   const vm = new Vue({
     el: '#app',
+    template: template,
     data () {
       return {
+        changeMessage: 'message',
         message: 'this is test',
         isShowNode: true
       }
@@ -31,6 +37,14 @@
     methods: {
       display () {
         this.data.isShowNode = !this.data.isShowNode
+      },
+      changeMessage () {
+        this.$nextTick(() => {
+          this.data.changeMessage = 'message nextTick change'
+        })
+        this.data.changeMessage = 'message change 1'
+        this.data.changeMessage = 'message change 2'
+        this.data.changeMessage = 'message change 3'
       },
     }
   })
